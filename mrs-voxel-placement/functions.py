@@ -1,5 +1,6 @@
-'''
-Main functions: 
+# -*- coding: utf-8 -*-
+"""
+Main functions:
 
 - execute_command
 - read_spar
@@ -7,13 +8,13 @@ Main functions:
 - create_mask_voxel
 - convert_to_bids
 - placement_new_voxel
-'''
+"""
 
 import json
 import os
 import subprocess
-
 from ast import literal_eval
+
 import nibabel as nib
 import numpy as np
 from scipy.spatial import Delaunay
@@ -21,15 +22,15 @@ from scipy.spatial.transform import Rotation
 
 
 def execute_command(command):
-    '''
+    """
     Execute command
 
     :param command: command to execute (a list)
 
     Example:
     - command = ['cd', 'path']
-    '''
-    print('\n', command)
+    """
+    print("\n", command)
     p = subprocess.Popen(
         command,
         shell=False,
@@ -40,13 +41,13 @@ def execute_command(command):
         close_fds=True,
     )
 
-    print('--------->PID:', p.pid)
+    print("--------->PID:", p.pid)
 
     (sdtoutl, stderrl) = p.communicate()
-    if str(sdtoutl) != '':
-        print('sdtoutl: ', sdtoutl.decode())
-    if str(stderrl) != '':
-        print('stderrl: ', stderrl.decode())
+    if str(sdtoutl) != "":
+        print("sdtoutl: ", sdtoutl.decode())
+    if str(stderrl) != "":
+        print("stderrl: ", stderrl.decode())
 
     result = p.wait()
 
@@ -54,26 +55,26 @@ def execute_command(command):
 
 
 def read_spar(filename):
-    '''Read the .spar file.
+    """Read the .spar file.
     :param filename: file path
 
     :return: dict of parameters read from spar file
     :rtype: dict
-    '''
+    """
 
     parameter_dict = {}
-    with open(filename, 'r', encoding='utf-8') as f:
+    with open(filename, "r", encoding="utf-8") as f:
         for line in f:
             # ignore comments (!) and empty lines
-            if line == '\n' or line.startswith('!'):
+            if line == "\n" or line.startswith("!"):
                 continue
 
             # Handle
-            key, value = map(str.strip, line.split(':', 1))
+            key, value = map(str.strip, line.split(":", 1))
             try:
                 val = literal_eval(value)
             except (ValueError, SyntaxError):
-                if value == '':
+                if value == "":
                     val = None
                 else:
                     val = value
@@ -84,7 +85,7 @@ def read_spar(filename):
 
 
 def get_rotation_matrice_from_euler_angles(alpha, beta, gamma, degrees=True):
-    ''' 
+    """
     Obtains rotation matrice using Euler angles
 
     :params alpha: first angle (a float)
@@ -94,7 +95,7 @@ def get_rotation_matrice_from_euler_angles(alpha, beta, gamma, degrees=True):
     :return: rotation matrix
     :rtype: numpy array
 
-    '''
+    """
     rad = np.pi / 180
 
     if degrees is True:
@@ -129,29 +130,30 @@ def get_rotation_matrice_from_euler_angles(alpha, beta, gamma, degrees=True):
 
 
 def create_mask_voxel(t1_path, parameters, out_path):
-    '''
+    """
     Create a binary mask for a MRS Voxel for Philips
     (using information from .SPAR file)
-    Adaptation python of 
-    https://github.com/markmikkelsen/Gannet/blob/a0753e271069a520c2e6c40c5cee204471ddbb0d/GannetMask_Philips.m#L4 
+    Adaptation python of
+    https://github.com/markmikkelsen/Gannet/blob/a0753e271069a520c2e6c40c5cee204471ddbb0d/GannetMask_Philips.m#L4
 
-    :param t1_path: file path of the anatomicatl data (.nii or .nii.gz file) (a string)
+    :param t1_path: file path of the anat data (.nii/ .nii.gz) (a string)
     :param parameters: a dict with parameters from SPAR file. (a dict)
-                       Should at least contains info about voxel angulation / center / size
+                       Should at least contains info about
+                       voxel angulation / center / size
                         ex: parameters = {
-                            'ap_size': 16, 
-                            'lr_size': 16, 
-                            'cc_size': 16, 
+                            'ap_size': 16,
+                            'lr_size': 16,
+                            'cc_size': 16,
                             'lr_off_center': -41.5,
                             'cc_off_center': 9.8,
                             'ap_off_center': -28.27,
-                            'ap_angulation': 0.71, 
+                            'ap_angulation': 0.71,
                             'lr_angulation': -1.11,
                             'cc_angulation': 2.08
                         }
     :param out_path: out file path of the binary mask (a string)
 
-    '''
+    """
     # Read T1
     t1 = nib.load(t1_path)
     dims = t1.shape
@@ -159,8 +161,12 @@ def create_mask_voxel(t1_path, parameters, out_path):
     header = t1.header
 
     # Generate X, Y, Z coordinate
-    X, Y, Z = np.meshgrid(np.arange(dims[0]), np.arange(
-        dims[1]), np.arange(dims[2]), indexing='ij')
+    X, Y, Z = np.meshgrid(
+        np.arange(dims[0]),
+        np.arange(dims[1]),
+        np.arange(dims[2]),
+        indexing="ij",
+    )
     XYZ = np.vstack([X.ravel(), Y.ravel(), Z.ravel()])
     # Convert XYZ whith addine matrix
     # XYZ = 3D coordinate of t1
@@ -168,7 +174,8 @@ def create_mask_voxel(t1_path, parameters, out_path):
     XYZ = np.matmul(affine[:3, :3], XYZ) + affine[:3, 3:4]
 
     # In matlab, shifting done, not here
-    # % Shift imaging voxel coordinates by half an imaging voxel so that the XYZ matrix
+    # % Shift imaging voxel coordinates by half an
+    # %imaging voxel so that the XYZ matrix
     # % tells us the x,y,z coordinates of the MIDDLE of that imaging voxel.
     # [~,voxdim2] = spm_get_bbox(V,'fv'); % MM (180220)
     # voxdim2 = abs(voxdim2)';
@@ -177,15 +184,15 @@ def create_mask_voxel(t1_path, parameters, out_path):
     # XYZ = XYZ + repmat(halfpixshift, [1 size(XYZ,2)]);
 
     # Get voxel info from spar
-    ap_size = parameters['ap_size']
-    lr_size = parameters['lr_size']
-    cc_size = parameters['cc_size']
-    ap_off = parameters['ap_off_center']
-    lr_off = parameters['lr_off_center']
-    cc_off = parameters['cc_off_center']
-    ap_ang = parameters['ap_angulation']
-    lr_ang = parameters['lr_angulation']
-    cc_ang = parameters['cc_angulation']
+    ap_size = parameters["ap_size"]
+    lr_size = parameters["lr_size"]
+    cc_size = parameters["cc_size"]
+    ap_off = parameters["ap_off_center"]
+    lr_off = parameters["lr_off_center"]
+    cc_off = parameters["cc_off_center"]
+    ap_ang = parameters["ap_angulation"]
+    lr_ang = parameters["lr_angulation"]
+    cc_ang = parameters["cc_angulation"]
 
     # Flip ap and lr axes to match NIFTI convention
     ap_off = -ap_off
@@ -193,20 +200,21 @@ def create_mask_voxel(t1_path, parameters, out_path):
     ap_ang = -ap_ang
     lr_ang = -lr_ang
 
-    vox_ctr = np.array([
-        [lr_size/2, -ap_size/2,  cc_size/2],
-        [-lr_size/2, -ap_size/2,  cc_size/2],
-        [-lr_size/2,  ap_size/2,  cc_size/2],
-        [lr_size/2,  ap_size/2,  cc_size/2],
-        [-lr_size/2,  ap_size/2, -cc_size/2],
-        [lr_size/2,  ap_size/2, -cc_size/2],
-        [lr_size/2, -ap_size/2, -cc_size/2],
-        [-lr_size/2, -ap_size/2, -cc_size/2]
-    ])
+    vox_ctr = np.array(
+        [
+            [lr_size / 2, -ap_size / 2, cc_size / 2],
+            [-lr_size / 2, -ap_size / 2, cc_size / 2],
+            [-lr_size / 2, ap_size / 2, cc_size / 2],
+            [lr_size / 2, ap_size / 2, cc_size / 2],
+            [-lr_size / 2, ap_size / 2, -cc_size / 2],
+            [lr_size / 2, ap_size / 2, -cc_size / 2],
+            [lr_size / 2, -ap_size / 2, -cc_size / 2],
+            [-lr_size / 2, -ap_size / 2, -cc_size / 2],
+        ]
+    )
 
     # Get voxel rotation
-    rotation = get_rotation_matrice_from_euler_angles(
-        lr_ang, ap_ang, cc_ang)
+    rotation = get_rotation_matrice_from_euler_angles(lr_ang, ap_ang, cc_ang)
     vox_rot = np.matmul(rotation, vox_ctr.T)
 
     # Get corner coordinate
@@ -216,9 +224,15 @@ def create_mask_voxel(t1_path, parameters, out_path):
 
     # Initial mask and sphere radius
     mask = np.zeros(XYZ.shape[1], dtype=int)
-    sphere_radius = np.sqrt((lr_size/2)**2 + (ap_size/2)**2 + (cc_size/2)**2)
+    sphere_radius = np.sqrt(
+        (lr_size / 2) ** 2 + (ap_size / 2) ** 2 + (cc_size / 2) ** 2
+    )
     dist2voxctr = np.sqrt(
-        np.sum((XYZ - np.tile(vox_ctr_coor[:, 0], (XYZ.shape[1], 1)).T)**2, axis=0))
+        np.sum(
+            (XYZ - np.tile(vox_ctr_coor[:, 0], (XYZ.shape[1], 1)).T) ** 2,
+            axis=0,
+        )
+    )
     sphere_mask = dist2voxctr <= sphere_radius
 
     mask[sphere_mask] = 1
@@ -232,15 +246,17 @@ def create_mask_voxel(t1_path, parameters, out_path):
 
     mask_vol = mask.reshape(dims)
     mask = nib.Nifti2Image(mask_vol, affine, header=header)
-    mask.header['descrip'] = 'MRS_voxel_mask'
-    mask.header['dim'] = t1.header['dim']
-    mask.header['datatype'] = t1.header['datatype']
+    mask.header["descrip"] = "MRS_voxel_mask"
+    mask.header["dim"] = t1.header["dim"]
+    mask.header["datatype"] = t1.header["datatype"]
 
     nib.save(mask, out_path)
 
 
-def convert_to_bids(dicom_directory, config_file, out_directory, sub_name, sess_name):
-    '''
+def convert_to_bids(
+    dicom_directory, config_file, out_directory, sub_name, sess_name
+):
+    """
     Convert to BIDS format (ie convert to NIfTI/json and do the BIDS hierarchy)
 
     :param dicom_directory: path to dicom (a string)
@@ -248,32 +264,35 @@ def convert_to_bids(dicom_directory, config_file, out_directory, sub_name, sess_
     :param out_directory: path to out directory (a string)
     :param sub_name: subject name (a string)
     :param sess_name: session name (a string)
-    '''
+    """
     # Launch dcm2bids
     cmd = [
-        'dcm2bids',
-        '-d',
+        "dcm2bids",
+        "-d",
         dicom_directory,
-        '-p',
+        "-p",
         sub_name,
-        '-s',
+        "-s",
         sess_name,
-        '-c',
+        "-c",
         config_file,
-        '-o',
+        "-o",
         out_directory,
     ]
     result, stderrl, sdtoutl = execute_command(cmd)
 
 
-def placement_new_voxel(out_directory, t1_ses1_path, list_spar_path, t1_ses2_path):
-    ''' 
-    Main function to get the placement of the voxel of the second session. 
+def placement_new_voxel(
+    out_directory, t1_ses1_path, list_spar_path, t1_ses2_path
+):
+    """
+    Main function to get the placement of the voxel of the second session.
 
-    This function have been inspired by the following work: 
-    Woodcock, Eric A. “Automated Voxel Placement: 
-    A Linux-Based Suite of Tools for Accurate and Reliable Single Voxel Coregistration.” 
-    Journal of Neuroimaging in Psychiatry & Neurology 3, no. 1 (2018): 1–8. 
+    This function have been inspired by the following work:
+    Woodcock, Eric A. “Automated Voxel Placement:
+    A Linux-Based Suite of Tools for Accurate and
+    Reliable Single Voxel Coregistration.”
+    Journal of Neuroimaging in Psychiatry & Neurology 3, no. 1 (2018): 1–8.
     https://doi.org/10.17756/jnpn.2018-020.
 
     See code here: https://github.com/ewoodcock/avp_scripts/tree/master
@@ -283,15 +302,24 @@ def placement_new_voxel(out_directory, t1_ses1_path, list_spar_path, t1_ses2_pat
     :param t1_ses1_path: path to T1 NIfTI from session 1 (a string)
     :param list_spar_path: list of the path of the .spar files (a list)
     :param t1_ses2_path: path to T1 NIfTI from session 2 (a string)
-    '''
+    """
     params_new_voxels = []
     # Registration sess02 to sess01 using flirt
-    dof6_matrice = os.path.join(out_directory, 'ses02_to_ses01_dof6.mat')
-    dof6_inv_matrice = dof6_matrice.replace('.mat', '_inverse.mat')
-    cmd = ['flirt',  '-dof', '6', '-in', t1_ses2_path,
-           '-ref', t1_ses1_path, '-omat',  dof6_matrice]
+    dof6_matrice = os.path.join(out_directory, "ses02_to_ses01_dof6.mat")
+    dof6_inv_matrice = dof6_matrice.replace(".mat", "_inverse.mat")
+    cmd = [
+        "flirt",
+        "-dof",
+        "6",
+        "-in",
+        t1_ses2_path,
+        "-ref",
+        t1_ses1_path,
+        "-omat",
+        dof6_matrice,
+    ]
     result, stderrl, sdtoutl = execute_command(cmd)
-    cmd = ['convert_xfm', '-inverse', dof6_matrice, '-omat', dof6_inv_matrice]
+    cmd = ["convert_xfm", "-inverse", dof6_matrice, "-omat", dof6_inv_matrice]
     result, stderrl, sdtoutl = execute_command(cmd)
 
     # In the article, a second affine transformation is computed with dof =9
@@ -302,19 +330,22 @@ def placement_new_voxel(out_directory, t1_ses1_path, list_spar_path, t1_ses2_pat
     # cmd = ['flirt',  '-dof', '9', '-in', t1_ses2_path,
     # '-ref', t1_ses1_path , '-omat',  dof9_matrice]
     # result, stderrl, sdtoutl = execute_command(cmd)
-    # cmd = ['convert_xfm', '-inverse', dof9_matrice ,'-omat', dof9_inv_matrice]
+    # cmd = ['convert_xfm', '-inverse', dof9_matrice ,'-omat',
+    # dof9_inv_matrice]
     # result, stderrl, sdtoutl = execute_command(cmd)
 
     for i, spar_path in enumerate(list_spar_path):
         out_directory_voxel = os.path.join(
-            out_directory, 'voxel_' + str(i + 1))
+            out_directory, "voxel_" + str(i + 1)
+        )
         if not os.path.exists(out_directory_voxel):
             os.makedirs(out_directory_voxel)
         # Create specific out paths by voxel
-        mask_path = os.path.join(out_directory_voxel, 'voxel_mask.nii')
+        mask_path = os.path.join(out_directory_voxel, "voxel_mask.nii")
         mask_ses02_path = os.path.join(
-            out_directory_voxel, 'voxel_mask_ses02.nii')
-        final_info_path = os.path.join(out_directory_voxel, 'voxel_ses02.json')
+            out_directory_voxel, "voxel_mask_ses02.nii"
+        )
+        final_info_path = os.path.join(out_directory_voxel, "voxel_ses02.json")
 
         # Read .SPAR to get session 1 voxel information
         params = read_spar(spar_path)
@@ -330,57 +361,63 @@ def placement_new_voxel(out_directory, t1_ses1_path, list_spar_path, t1_ses2_pat
         # Compute final rotation
         subject_rot = np.loadtxt(dof6_inv_matrice)[0:3, 0:3]
         voxel_rotation = get_rotation_matrice_from_euler_angles(
-            -params['lr_angulation'],
-            -params['ap_angulation'],
-            params['cc_angulation']
+            -params["lr_angulation"],
+            -params["ap_angulation"],
+            params["cc_angulation"],
         )
         final_rot = np.matmul(voxel_rotation, subject_rot.T)
 
         # Get new Euler angle
         r = Rotation.from_matrix(final_rot)
-        angles = r.as_euler('zyx', degrees=True)
+        angles = r.as_euler("zyx", degrees=True)
         # It seems that it give the angle as follow : cc, -ap, -lr
         new_cc_ang = angles[0]
         new_ap_ang = angles[1]
         new_lr_ang = angles[2]
 
         # Get new center coord file
-        coord_file = os.path.join(out_directory_voxel, 'voxel_coord.txt')
-        with open(coord_file, 'w', encoding='utf-8') as my_file:
+        coord_file = os.path.join(out_directory_voxel, "voxel_coord.txt")
+        with open(coord_file, "w", encoding="utf-8") as my_file:
             my_file.write(
-                str(-params['lr_off_center']) + ' ' +
-                str(-params['ap_off_center']) + ' ' +
-                str(params['cc_off_center'])
+                str(-params["lr_off_center"])
+                + " "
+                + str(-params["ap_off_center"])
+                + " "
+                + str(params["cc_off_center"])
             )
 
         cmd = [
-            'img2imgcoord',
-            '-src',
+            "img2imgcoord",
+            "-src",
             t1_ses1_path,
-            '-dest',
+            "-dest",
             t1_ses2_path,
-            '-xfm',
+            "-xfm",
             dof6_inv_matrice,
-            '-mm',
-            coord_file
+            "-mm",
+            coord_file,
         ]
         result, stderrl, sdtoutl = execute_command(cmd)
-        new_coord = sdtoutl.decode().replace(
-            'Coordinates in Destination volume (in mm)', '').replace('\n', '').split('  ')
+        new_coord = (
+            sdtoutl.decode()
+            .replace("Coordinates in Destination volume (in mm)", "")
+            .replace("\n", "")
+            .split("  ")
+        )
 
         # Create new mask
         params_new = {}
-        params_new['ap_size'] = params['ap_size']
-        params_new['lr_size'] = params['lr_size']
-        params_new['cc_size'] = params['cc_size']
-        params_new['lr_off_center'] = round(-float(new_coord[0]), 2)
-        params_new['ap_off_center'] = round(-float(new_coord[1]), 2)
-        params_new['cc_off_center'] = round(float(new_coord[2]), 2)
-        params_new['ap_angulation'] = round(-new_ap_ang, 2)
-        params_new['lr_angulation'] = round(-new_lr_ang, 2)
-        params_new['cc_angulation'] = round(new_cc_ang, 2)
+        params_new["ap_size"] = params["ap_size"]
+        params_new["lr_size"] = params["lr_size"]
+        params_new["cc_size"] = params["cc_size"]
+        params_new["lr_off_center"] = round(-float(new_coord[0]), 2)
+        params_new["ap_off_center"] = round(-float(new_coord[1]), 2)
+        params_new["cc_off_center"] = round(float(new_coord[2]), 2)
+        params_new["ap_angulation"] = round(-new_ap_ang, 2)
+        params_new["lr_angulation"] = round(-new_lr_ang, 2)
+        params_new["cc_angulation"] = round(new_cc_ang, 2)
 
-        with open(final_info_path, 'w', encoding='utf-8') as out:
+        with open(final_info_path, "w", encoding="utf-8") as out:
             json.dump(params_new, out)
 
         create_mask_voxel(t1_ses2_path, params_new, mask_ses02_path)

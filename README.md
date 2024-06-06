@@ -15,11 +15,11 @@ Table of contents
 This little application has been developed for a specific use and is not intended to be modular.
 For now it is only work for Philips MRS data (using .SPAR file).
 
-This work have been inspired by the following work: 
+This work have been inspired by the following work:
 
-Woodcock, Eric A. “Automated Voxel Placement: 
-A Linux-Based Suite of Tools for Accurate and Reliable Single Voxel Coregistration.” 
-Journal of Neuroimaging in Psychiatry & Neurology 3, no. 1 (2018): 1–8. 
+Woodcock, Eric A. “Automated Voxel Placement:
+A Linux-Based Suite of Tools for Accurate and Reliable Single Voxel Coregistration.”
+Journal of Neuroimaging in Psychiatry & Neurology 3, no. 1 (2018): 1–8.
 https://doi.org/10.17756/jnpn.2018-020.
 
 See code here: https://github.com/ewoodcock/avp_scripts/tree/master
@@ -28,7 +28,7 @@ See code here: https://github.com/ewoodcock/avp_scripts/tree/master
 <a name="how-to-use"></a>
 ## How to use
 
-If it is the firt time you use this module, you need to configure your `config/config.json` as explain in the ["How to install"](#how-to-install) part. 
+If it is the firt time you use this module, you need to configure your `config/config.json` as explain in the ["How to install"](#how-to-install) part.
 
 You only need to give DICOM directories path and the module will organize your data in BIDS (using [dcm2bids](https://unfmontreal.github.io/Dcm2Bids)) in your output directory. A [dcm2bids configuration file](https://unfmontreal.github.io/Dcm2Bids/3.1.1/how-to/create-config-file/) should be specified in the `BidsConfigFile` field in the [configuration file](./config/config.json) in order to recognize automatically T1w image.
 
@@ -38,15 +38,15 @@ You only need to give DICOM directories path and the module will organize your d
 ```bash
 python /mrs-voxel-placement/mrs-voxel-placement/main.py
 ```
-The following window will appears: 
+The following window will appears:
 
 ![Module](./mrs-voxel-placement/module.png)
 
-- Fill "Study" and "Patient identification" 
+- Fill "Study" and "Patient identification"
 
 - In the "session 1" part, click on "DICOM T1" and choose your DICOM directory for the first session (that contains T1w image)
 
-- In the "session 1" part, click on "SPAR VOXEL 1" and choose the .spar file of MRS of the first session 
+- In the "session 1" part, click on "SPAR VOXEL 1" and choose the .spar file of MRS of the first session
 
 - If you have a second MRS acquistion with a different voxel placement for your first session : in the "session 1" part, click on "SPAR VOXEL 2" and choose the .spar file corresponding to this acquistion
 
@@ -83,7 +83,7 @@ git clone https://github.com/IRMaGe-3T/mrs-voxel-placement.git
 The following python librairies are required:
 
 - argparse
-- ast 
+- ast
 - dcm2bids>=3.1.1
 - json
 - pyQt5
@@ -91,9 +91,9 @@ The following python librairies are required:
 - numpy
 - scipy
 
-The following sofware are required: 
+The following sofware are required:
 
-- [dcm2niix](https://github.com/rordenlab/dcm2niix/releases) 
+- [dcm2niix](https://github.com/rordenlab/dcm2niix/releases)
 - [FSL](https://fsl.fmrib.ox.ac.uk/fsl/docs/#/)
 
 
@@ -110,4 +110,3 @@ Add the following path in the configuration file:
     "BidsConfigFile": "/path/to/bidsd_dcm2bids_config_template.json"
 }
 ```
-
