@@ -44,7 +44,7 @@ def main_cli():
 
     # Set path
     args = parser.parse_args()
-    list_spar_path = args.spar
+    list_spar_files = args.spar
     t1_ses1_path = args.session1
     t1_ses2_path = args.session2
     study_name = args.study
@@ -95,12 +95,30 @@ def main_cli():
     )
     if not os.path.exists(analysis_directory):
         os.makedirs(analysis_directory)
-    placement_new_voxel(
-        analysis_directory,
-        t1_ses1_nifti_path,
-        list_spar_path,
-        t1_ses2_nifti_path,
-    )
+    params_new_voxels = placement_new_voxel(
+                    analysis_directory,
+                    t1_ses1_nifti_path,
+                    list_spar_files,
+                    t1_ses2_nifti_path,
+                )
+
+    for i, params_new in enumerate(params_new_voxels):
+        print(
+            f"\n\nFor voxel {str(i + 1)}, the following "
+            "information should be used at the scanner: "
+            f"\nVoxel Size: \n"
+            f' ap_size : {params_new["ap_size"]} \n'
+            f' lr_size: {params_new["lr_size"]} \n'
+            f' cc_size: {params_new["cc_size"]} '
+            f"\nVoxel off center: \n"
+            f' ap_off_center : {params_new["ap_off_center"]} \n'
+            f' lr_off_center: {params_new["lr_off_center"]} \n'
+            f' cc_off_center: {params_new["cc_off_center"]}'
+            f"\nVoxel angulation: \n"
+            f' ap_angulation : {params_new["ap_angulation"]} \n'
+            f' lr_angulation: {params_new["lr_angulation"]} \n'
+            f' cc_angulation: {params_new["cc_angulation"]}'
+        )
 
 
 class App(QMainWindow):
@@ -249,17 +267,17 @@ class App(QMainWindow):
                         f"\n\nFor voxel {str(i + 1)}, the following "
                         "information should be used at the scanner: "
                         f"\nVoxel Size: \n"
-                        f'ap_size : {params_new["ap_size"]} \n'
-                        f'lr_size: {params_new["lr_size"]} \n'
-                        f'cc_size: {params_new["cc_size"]} '
+                        f' ap_size : {params_new["ap_size"]} \n'
+                        f' lr_size: {params_new["lr_size"]} \n'
+                        f' cc_size: {params_new["cc_size"]} '
                         f"\nVoxel off center: \n"
-                        f'ap_off_center : {params_new["ap_off_center"]} \n'
-                        f'lr_off_center: {params_new["lr_off_center"]} \n  '
-                        f'cc_off_center: {params_new["cc_off_center"]}'
+                        f' ap_off_center : {params_new["ap_off_center"]} \n'
+                        f' lr_off_center: {params_new["lr_off_center"]} \n'
+                        f' cc_off_center: {params_new["cc_off_center"]}'
                         f"\nVoxel angulation: \n"
-                        f'ap_angulation : {params_new["ap_angulation"]} \n'
-                        f'lr_angulation: {params_new["lr_angulation"]} \n  '
-                        f'cc_angulation: {params_new["cc_angulation"]}'
+                        f' ap_angulation : {params_new["ap_angulation"]} \n'
+                        f' lr_angulation: {params_new["lr_angulation"]} \n'
+                        f' cc_angulation: {params_new["cc_angulation"]}'
                     )
 
 
