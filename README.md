@@ -1,6 +1,6 @@
 # mrs-voxel-placement
 
-Obtain voxel placement presciption for a new MRS session using a old MRS session.
+Obtain voxel placement prescription for a new MRS session using a old MRS session.
 
 The first session and the new session (session 2) need to contain T1w anatomical data.
 
