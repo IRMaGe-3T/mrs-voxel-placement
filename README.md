@@ -38,7 +38,7 @@ You only need to give DICOM directories path and the module will organize your d
 ```bash
 python /mrs-voxel-placement/mrs-voxel-placement/main.py
 ```
-The following window will appears:
+The following window will appear:
 
 ![Module](./mrs-voxel-placement/module.png)
 
