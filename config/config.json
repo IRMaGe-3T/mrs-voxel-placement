@@ -1,4 +1,4 @@
 {
-    "OutputDirectory": "/home/gourieuxe/code/test_spectro/database",
-    "BidsConfigFile": "/home/gourieuxe/code/test_spectro/mrs-voxel-placement/config/bids_dcm2bids_config_template.json"
+    "OutputDirectory": "/path/to/database",
+    "BidsConfigFile": "/path/mrs-voxel-placement/config/bids_dcm2bids_config_template.json"
 }
