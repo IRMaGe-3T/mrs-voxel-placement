@@ -407,21 +407,33 @@ def placement_new_voxel(
 
         # Create new mask
         params_new = {}
-        params_new["AP_size"] = params["ap_size"]
-        params_new["RL_size"] = params["lr_size"]
-        params_new["FH_size"] = params["cc_size"]
-        params_new["RL_off_center"] = round(-float(new_coord[0]), 2)
-        params_new["AP_off_center"] = round(-float(new_coord[1]), 2)
-        params_new["FH_off_center"] = round(float(new_coord[2]), 2)
-        params_new["AP_angulation"] = round(-new_ap_ang, 2)
-        params_new["RL_angulation"] = round(-new_lr_ang, 2)
-        params_new["FH_angulation"] = round(new_cc_ang, 2)
-
-        with open(final_info_path, "w", encoding="utf-8") as out:
-            json.dump(params_new, out)
+        params_new["ap_size"] = params["ap_size"]
+        params_new["lr_size"] = params["lr_size"]
+        params_new["cc_size"] = params["cc_size"]
+        params_new["lr_off_center"] = round(-float(new_coord[0]), 2)
+        params_new["ap_off_center"] = round(-float(new_coord[1]), 2)
+        params_new["cc_off_center"] = round(float(new_coord[2]), 2)
+        params_new["ap_angulation"] = round(-new_ap_ang, 2)
+        params_new["lr_angulation"] = round(-new_lr_ang, 2)
+        params_new["cc_angulation"] = round(new_cc_ang, 2)
 
         create_mask_voxel(t1_ses2_path, params_new, mask_ses02_path)
 
+        # Adapte name for the scanner
+        params_new_2 = {}
+        params_new_2["AP_size"] = params_new["ap_size"]
+        params_new_2["RL_size"] = params_new["lr_size"]
+        params_new_2["FH_size"] = params_new["cc_size"]
+        params_new_2["RL_off_center"] = params_new["lr_off_center"]
+        params_new_2["AP_off_center"] = params_new["ap_off_center"]
+        params_new_2["FH_off_center"] = params_new["cc_off_center"]
+        params_new_2["AP_angulation"] = params_new["ap_angulation"]
+        params_new_2["RL_angulation"] = params_new["lr_angulation"]
+        params_new_2["FH_angulation"] = params_new["cc_angulation"]
+
+        with open(final_info_path, "w", encoding="utf-8") as out:
+            json.dump(params_new_2, out)
+
         # Return info to use in the scanner
-        params_new_voxels.append(params_new)
+        params_new_voxels.append(params_new_2)
     return params_new_voxels
