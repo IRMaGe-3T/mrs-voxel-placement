@@ -107,17 +107,17 @@ def main_cli():
             f"\n\nFor voxel {str(i + 1)}, the following "
             "information should be used at the scanner: "
             f"\nVoxel Size: \n"
-            f' ap_size : {params_new["ap_size"]} \n'
-            f' lr_size: {params_new["lr_size"]} \n'
-            f' cc_size: {params_new["cc_size"]} '
+            f' AP: {params_new["AP_size"]:10.2f} \n'
+            f' RL: {params_new["RL_size"]:10.2f} \n'
+            f' FH: {params_new["FH_size"]:10.2f} '
             f"\nVoxel off center: \n"
-            f' ap_off_center : {params_new["ap_off_center"]} \n'
-            f' lr_off_center: {params_new["lr_off_center"]} \n'
-            f' cc_off_center: {params_new["cc_off_center"]}'
+            f' AP: {params_new["AP_off_center"]:10.2f} \n'
+            f' RL: {params_new["RL_off_center"]:10.2f} \n'
+            f' FH: {params_new["FH_off_center"]:10.2f}'
             f"\nVoxel angulation: \n"
-            f' ap_angulation : {params_new["ap_angulation"]} \n'
-            f' lr_angulation: {params_new["lr_angulation"]} \n'
-            f' cc_angulation: {params_new["cc_angulation"]}'
+            f' AP: {params_new["AP_angulation"]:10.2f} \n'
+            f' RL: {params_new["RL_angulation"]:10.2f} \n'
+            f' FH: {params_new["FH_angulation"]:10.2f}'
         )
 
 
@@ -134,18 +134,29 @@ class App(QMainWindow):
         ui_file = os.path.join(self.dir_code_path, "interface.ui")
         loadUi(ui_file, self)
 
+        config_file = os.path.join(
+            os.path.dirname(
+                self.dir_code_path
+            ),
+            "config",
+            "config.json",
+        )
+        with open(config_file, encoding="utf-8") as my_json:
+            data = json.load(my_json)
+            out_directory = data["OutputDirectory"]
+
         # Connect sigans and slots
         self.pushButton_sess01_T1.clicked.connect(
-            lambda: self.browse_directory("sess01_T1")
+            lambda: self.browse_directory("sess01_T1", out_directory)
         )
         self.pushButton_sess01_spar_1.clicked.connect(
-            lambda: self.browse_file("sess01_spar_1")
+            lambda: self.browse_file("sess01_spar_1", out_directory)
         )
         self.pushButton_sess01_spar_2.clicked.connect(
-            lambda: self.browse_file("sess01_spar_2")
+            lambda: self.browse_file("sess01_spar_2", out_directory)
         )
         self.pushButton_sess02_T1.clicked.connect(
-            lambda: self.browse_directory("sess02_T1")
+            lambda: self.browse_directory("sess02_T1", out_directory)
         )
         self.pushButton_run.clicked.connect(self.get_patient_name)
         self.pushButton_run.clicked.connect(self.get_study_name)
@@ -159,14 +170,14 @@ class App(QMainWindow):
         """Get study name from edit line"""
         self.study_name = self.lineEdit_study.text()
 
-    def browse_file(self, name):
+    def browse_file(self, name, out):
         """Browse file"""
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "Sélectionner un fichier",
-            QDir.homePath(),
+            out,
             "Tous les fichiers (*)",
             options=options,
         )
@@ -179,10 +190,15 @@ class App(QMainWindow):
                 self.spar_path_2 = file_path
                 self.textEdit_sess01_spar_2.setText(self.spar_path_2)
 
-    def browse_directory(self, name):
+    def browse_directory(self, name, out):
         """Browse DICOM directory"""
+        options = QFileDialog.Options()
+        options |= QFileDialog.ShowDirsOnly
         directory = QFileDialog.getExistingDirectory(
-            self, "Sélectionner un répertoire", QDir.homePath()
+            self,
+            "Sélectionner un répertoire",
+            out,
+            options=options,
         )
 
         if directory:
@@ -267,19 +283,18 @@ class App(QMainWindow):
                         f"\n\nFor voxel {str(i + 1)}, the following "
                         "information should be used at the scanner: "
                         f"\nVoxel Size: \n"
-                        f' ap_size : {params_new["ap_size"]} \n'
-                        f' lr_size: {params_new["lr_size"]} \n'
-                        f' cc_size: {params_new["cc_size"]} '
+                        f' AP: {params_new["AP_size"]:10.2f} \n'
+                        f' RL: {params_new["RL_size"]:10.2f} \n'
+                        f' FH: {params_new["FH_size"]:10.2f} '
                         f"\nVoxel off center: \n"
-                        f' ap_off_center : {params_new["ap_off_center"]} \n'
-                        f' lr_off_center: {params_new["lr_off_center"]} \n'
-                        f' cc_off_center: {params_new["cc_off_center"]}'
+                        f' AP: {params_new["AP_off_center"]:10.2f} \n'
+                        f' RL: {params_new["RL_off_center"]:10.2f} \n'
+                        f' FH: {params_new["FH_off_center"]:10.2f}'
                         f"\nVoxel angulation: \n"
-                        f' ap_angulation : {params_new["ap_angulation"]} \n'
-                        f' lr_angulation: {params_new["lr_angulation"]} \n'
-                        f' cc_angulation: {params_new["cc_angulation"]}'
+                        f' AP: {params_new["AP_angulation"]:10.2f} \n'
+                        f' RL: {params_new["RL_angulation"]:10.2f} \n'
+                        f' FH: {params_new["FH_angulation"]:10.2f}'
                     )
-
 
 def main_gui():
     """Main gui"""

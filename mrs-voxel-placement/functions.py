@@ -407,15 +407,15 @@ def placement_new_voxel(
 
         # Create new mask
         params_new = {}
-        params_new["ap_size"] = params["ap_size"]
-        params_new["lr_size"] = params["lr_size"]
-        params_new["cc_size"] = params["cc_size"]
-        params_new["lr_off_center"] = round(-float(new_coord[0]), 2)
-        params_new["ap_off_center"] = round(-float(new_coord[1]), 2)
-        params_new["cc_off_center"] = round(float(new_coord[2]), 2)
-        params_new["ap_angulation"] = round(-new_ap_ang, 2)
-        params_new["lr_angulation"] = round(-new_lr_ang, 2)
-        params_new["cc_angulation"] = round(new_cc_ang, 2)
+        params_new["AP_size"] = params["ap_size"]
+        params_new["RL_size"] = params["lr_size"]
+        params_new["FH_size"] = params["cc_size"]
+        params_new["RL_off_center"] = round(-float(new_coord[0]), 2)
+        params_new["AP_off_center"] = round(-float(new_coord[1]), 2)
+        params_new["FH_off_center"] = round(float(new_coord[2]), 2)
+        params_new["AP_angulation"] = round(-new_ap_ang, 2)
+        params_new["RL_angulation"] = round(-new_lr_ang, 2)
+        params_new["FH_angulation"] = round(new_cc_ang, 2)
 
         with open(final_info_path, "w", encoding="utf-8") as out:
             json.dump(params_new, out)
