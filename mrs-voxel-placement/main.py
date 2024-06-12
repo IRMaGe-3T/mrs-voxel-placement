@@ -10,7 +10,6 @@ import sys
 
 from functions import convert_to_bids, placement_new_voxel
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QDir
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow
 from PyQt5.uic import loadUi
 
@@ -96,11 +95,11 @@ def main_cli():
     if not os.path.exists(analysis_directory):
         os.makedirs(analysis_directory)
     params_new_voxels = placement_new_voxel(
-                    analysis_directory,
-                    t1_ses1_nifti_path,
-                    list_spar_files,
-                    t1_ses2_nifti_path,
-                )
+        analysis_directory,
+        t1_ses1_nifti_path,
+        list_spar_files,
+        t1_ses2_nifti_path,
+    )
 
     for i, params_new in enumerate(params_new_voxels):
         print(
@@ -135,28 +134,27 @@ class App(QMainWindow):
         loadUi(ui_file, self)
 
         config_file = os.path.join(
-            os.path.dirname(
-                self.dir_code_path
-            ),
+            os.path.dirname(self.dir_code_path),
             "config",
             "config.json",
         )
         with open(config_file, encoding="utf-8") as my_json:
             data = json.load(my_json)
-            out_directory = data["OutputDirectory"]
+            self.out_directory = data["OutputDirectory"]
+            self.bids_config_file = data["BidsConfigFile"]
 
         # Connect sigans and slots
         self.pushButton_sess01_T1.clicked.connect(
-            lambda: self.browse_directory("sess01_T1", out_directory)
+            lambda: self.browse_directory("sess01_T1", self.out_directory)
         )
         self.pushButton_sess01_spar_1.clicked.connect(
-            lambda: self.browse_file("sess01_spar_1", out_directory)
+            lambda: self.browse_file("sess01_spar_1", self.out_directory)
         )
         self.pushButton_sess01_spar_2.clicked.connect(
-            lambda: self.browse_file("sess01_spar_2", out_directory)
+            lambda: self.browse_file("sess01_spar_2", self.out_directory)
         )
         self.pushButton_sess02_T1.clicked.connect(
-            lambda: self.browse_directory("sess02_T1", out_directory)
+            lambda: self.browse_directory("sess02_T1", self.out_directory)
         )
         self.pushButton_run.clicked.connect(self.get_patient_name)
         self.pushButton_run.clicked.connect(self.get_study_name)
@@ -177,7 +175,7 @@ class App(QMainWindow):
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             "Sélectionner un fichier",
-            out,
+            os.path.dirname(out),
             "Tous les fichiers (*)",
             options=options,
         )
@@ -197,7 +195,7 @@ class App(QMainWindow):
         directory = QFileDialog.getExistingDirectory(
             self,
             "Sélectionner un répertoire",
-            out,
+            os.path.dirname(out),
             options=options,
         )
 
@@ -214,30 +212,21 @@ class App(QMainWindow):
         if self.patient_name and self.study_name:
             if self.spar_path_1 and self.t1_ses1_path and self.t1_ses2_path:
                 # Convert DICOM to NIfTI
-                config_file = os.path.join(
-                    os.path.dirname(
-                        os.path.realpath(os.path.dirname(__file__))
-                    ),
-                    "config",
-                    "config.json",
+                out_directory = os.path.join(
+                    self.out_directory, self.study_name
                 )
-                with open(config_file, encoding="utf-8") as my_json:
-                    data = json.load(my_json)
-                    bids_config_file = data["BidsConfigFile"]
-                    out_directory = data["OutputDirectory"]
-                out_directory = os.path.join(out_directory, self.study_name)
                 if not os.path.exists(out_directory):
                     os.makedirs(out_directory)
                 convert_to_bids(
                     self.t1_ses1_path,
-                    bids_config_file,
+                    self.bids_config_file,
                     out_directory,
                     self.patient_name,
                     "1",
                 )
                 convert_to_bids(
                     self.t1_ses2_path,
-                    bids_config_file,
+                    self.bids_config_file,
                     out_directory,
                     self.patient_name,
                     "2",
@@ -295,6 +284,7 @@ class App(QMainWindow):
                         f' RL: {params_new["RL_angulation"]:10.2f} \n'
                         f' FH: {params_new["FH_angulation"]:10.2f}'
                     )
+
 
 def main_gui():
     """Main gui"""
