@@ -345,7 +345,9 @@ def placement_new_voxel(
         mask_ses02_path = os.path.join(
             out_directory_voxel, "voxel_mask_ses02.nii"
         )
-        final_info_path = os.path.join(out_directory_voxel, "voxel_ses02.json")
+        final_info_path = os.path.join(
+            out_directory_voxel, "info_voxel_final_ses02.json"
+        )
 
         # Read .SPAR to get session 1 voxel information
         params = read_spar(spar_path)
@@ -404,6 +406,8 @@ def placement_new_voxel(
             .replace("\n", "")
             .split("  ")
         )
+
+        os.remove(coord_file)
 
         # Create new mask
         params_new = {}
