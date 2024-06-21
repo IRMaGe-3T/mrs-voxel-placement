@@ -181,6 +181,8 @@ class App(QMainWindow):
         )
 
         if file_path:
+            self.spar_path_1 = ""
+            self.spar_path_2 = ""
             if name == "sess01_spar_1":
                 self.spar_path_1 = file_path
                 self.textEdit_sess01_spar_1.setText(self.spar_path_1)
@@ -284,6 +286,13 @@ class App(QMainWindow):
                         f' RL: {params_new["RL_angulation"]:10.2f} \n'
                         f' FH: {params_new["FH_angulation"]:10.2f}'
                     )
+            else:
+                print(
+                    "'DICOM T1' fields are mandatory for session 1 and 2. "
+                    "'SPAR VOXEL 1' field is mandatory for session 1"
+                )
+        else:
+            print("'Study' and 'Patient identification' fields are mandatory")
 
 
 def main_gui():
