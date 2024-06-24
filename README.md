@@ -33,7 +33,7 @@ If it is the firt time you use this module, you need to configure your `config/c
 You only need to give DICOM directories path and the module will organize your data in BIDS (using [dcm2bids](https://unfmontreal.github.io/Dcm2Bids)) in your output directory. A [dcm2bids configuration file](https://unfmontreal.github.io/Dcm2Bids/3.1.1/how-to/create-config-file/) should be specified in the `BidsConfigFile` field in the [configuration file](./config/config.json) in order to recognize automatically T1w image.
 
 
-### Launch the module without arguements
+### Launch the module without arguments
 
 ```bash
 python /mrs-voxel-placement/mrs-voxel-placement/main.py
@@ -59,7 +59,7 @@ The size, off center and angulation to used for the placement of the voxel for t
 You can also find all the information in the file `/OutputDirectory/derivatives/sub-*/ses-*/mrs-voxel-placement`.
 
 
-### Launch the module with arguements
+### Launch the module with arguments
 
 ```bash
 python /mrs-voxel-placement/mrs-voxel-placement/main.py --session1 path/to/dicom/sess1 --session2 path/to/dicom/sess2 --spar path/to/spar/file/1 path/to/spar/file/2 --study studyname --patient patientname
