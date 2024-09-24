@@ -14,7 +14,7 @@ Table of contents
 ## Disclaimer
 This little application has been developed for a specific use and is not intended to be modular.
 For now it is only work for Philips MRS data (using .SPAR file).
-Please, open an issue if you 
+Please, open an issue if you want to use it for Siemens / GE data.
 
 This work have been inspired by the following work:
 
