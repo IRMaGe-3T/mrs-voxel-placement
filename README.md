@@ -1,8 +1,8 @@
 # mrs-voxel-placement
 
-Obtain voxel placement prescription for a new MRS session using a old MRS session.
+Obtain voxel placement prescription for a new MRS session based on a previous MRS session.
 
-The first session and the new session (session 2) need to contain T1w anatomical data.
+Both the initial and the new (second) session must include T1-weighted anatomical data.
 
 Table of contents
 
@@ -14,6 +14,7 @@ Table of contents
 ## Disclaimer
 This little application has been developed for a specific use and is not intended to be modular.
 For now it is only work for Philips MRS data (using .SPAR file).
+Please, open an issue if you 
 
 This work have been inspired by the following work:
 
