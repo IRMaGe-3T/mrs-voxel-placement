@@ -84,9 +84,7 @@ git clone https://github.com/IRMaGe-3T/mrs-voxel-placement.git
 The following python librairies are required:
 
 - argparse
-- ast
 - dcm2bids>=3.1.1
-- json
 - pyQt5
 - nibabel
 - numpy
