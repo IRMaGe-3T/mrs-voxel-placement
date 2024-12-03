@@ -29,7 +29,7 @@ See code here: https://github.com/ewoodcock/avp_scripts/tree/master
 <a name="how-to-use"></a>
 ## How to use
 
-If it is the firt time you use this module, you need to configure your `config/config.json` as explain in the ["How to install"](#how-to-install) part.
+If it is the first time you use this module, you need to configure your `config/config.json` as explain in the ["How to install"](#how-to-install) part.
 
 You only need to give DICOM directories path and the module will organize your data in BIDS (using [dcm2bids](https://unfmontreal.github.io/Dcm2Bids)) in your output directory. A [dcm2bids configuration file](https://unfmontreal.github.io/Dcm2Bids/3.1.1/how-to/create-config-file/) should be specified in the `BidsConfigFile` field in the [configuration file](./config/config.json) in order to recognize automatically T1w image.
 
