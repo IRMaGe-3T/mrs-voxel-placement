@@ -1,8 +1,8 @@
 # mrs-voxel-placement
 
-Obtain voxel placement prescription for a new MRS session using a old MRS session.
+Obtain voxel placement prescription for a new MRS session based on a previous MRS session.
 
-The first session and the new session (session 2) need to contain T1w anatomical data.
+Both the initial and the new (second) session must include T1-weighted anatomical data.
 
 Table of contents
 
@@ -13,9 +13,14 @@ Table of contents
 <a name="disclaimer"></a>
 ## Disclaimer
 This little application has been developed for a specific use and is not intended to be modular.
+<<<<<<< HEAD
 For now it is only work for Philips MRS data (using .SPAR file for MRS data).
 
 Use for Siemens data (using DICOM file for MRS data) is under development
+=======
+For now it is only work for Philips MRS data (using .SPAR file).
+Please, open an issue if you want to use it for Siemens / GE data.
+>>>>>>> dde0267ee74276ddf40465bdfc6ae52712adc69a
 
 This work have been inspired by the following work:
 
@@ -35,7 +40,7 @@ If it is the firt time you use this module, you need to configure your `config/c
 You only need to give DICOM directories path and the module will organize your data in BIDS (using [dcm2bids](https://unfmontreal.github.io/Dcm2Bids)) in your output directory. A [dcm2bids configuration file](https://unfmontreal.github.io/Dcm2Bids/3.1.1/how-to/create-config-file/) should be specified in the `BidsConfigFile` field in the [configuration file](./config/config.json) in order to recognize automatically T1w image.
 
 
-### Launch the module without arguements
+### Launch the module without arguments
 
 ```bash
 python /mrs-voxel-placement/mrs-voxel-placement/main.py
@@ -61,7 +66,7 @@ The size, off center and angulation to used for the placement of the voxel for t
 You can also find all the information in the file `/OutputDirectory/derivatives/sub-*/ses-*/mrs-voxel-placement`.
 
 
-### Launch the module with arguements
+### Launch the module with arguments
 
 ```bash
 python /mrs-voxel-placement/mrs-voxel-placement/main.py --session1 path/to/dicom/sess1 --session2 path/to/dicom/sess2 --spectro_files path/to/spectro/file/1 path/to/spectro/file/2 --study studyname --patient patientname
@@ -86,7 +91,6 @@ The following python librairies are required:
 
 - argparse
 - dcm2bids>=3.1.1
-- json
 - pyQt5
 - nibabel
 - numpy
