@@ -13,14 +13,8 @@ Table of contents
 <a name="disclaimer"></a>
 ## Disclaimer
 This little application has been developed for a specific use and is not intended to be modular.
-<<<<<<< HEAD
 For now it is only work for Philips MRS data (using .SPAR file for MRS data).
-
 Use for Siemens data (using DICOM file for MRS data) is under development
-=======
-For now it is only work for Philips MRS data (using .SPAR file).
-Please, open an issue if you want to use it for Siemens / GE data.
->>>>>>> dde0267ee74276ddf40465bdfc6ae52712adc69a
 
 This work have been inspired by the following work:
 
