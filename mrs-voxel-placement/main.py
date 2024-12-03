@@ -8,7 +8,8 @@ import json
 import os
 import sys
 
-from functions import convert_to_bids, placement_new_voxel
+from functions_main import placement_new_voxel
+from functions_utils import convert_to_bids
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow
 from PyQt5.uic import loadUi
@@ -33,9 +34,9 @@ def main_cli():
         help="DICOM directory anatomical data session 02",
     )
     parser.add_argument(
-        "--spar",
+        "--spectro_files",
         required=True,
-        help="spar file session 01",
+        help="spectro files session 01",
         nargs="+",
     )
     parser.add_argument("--study", required=False, help="Study name")
@@ -43,7 +44,7 @@ def main_cli():
 
     # Set path
     args = parser.parse_args()
-    list_spar_files = args.spar
+    list_spectro_files = args.spectro_files
     t1_ses1_path = args.session1
     t1_ses2_path = args.session2
     study_name = args.study
@@ -94,30 +95,32 @@ def main_cli():
     )
     if not os.path.exists(analysis_directory):
         os.makedirs(analysis_directory)
-    params_new_voxels = placement_new_voxel(
+    manufacturer, params_new_voxels = placement_new_voxel(
         analysis_directory,
         t1_ses1_nifti_path,
-        list_spar_files,
+        list_spectro_files,
         t1_ses2_nifti_path,
     )
 
-    for i, params_new in enumerate(params_new_voxels):
-        print(
-            f"\n\nFor voxel {str(i + 1)}, the following "
-            "information should be used at the scanner: "
-            f"\nVoxel Size: \n"
-            f' AP: {params_new["AP_size"]:10.2f} \n'
-            f' RL: {params_new["RL_size"]:10.2f} \n'
-            f' FH: {params_new["FH_size"]:10.2f} '
-            f"\nVoxel off center: \n"
-            f' AP: {params_new["AP_off_center"]:10.2f} \n'
-            f' RL: {params_new["RL_off_center"]:10.2f} \n'
-            f' FH: {params_new["FH_off_center"]:10.2f}'
-            f"\nVoxel angulation: \n"
-            f' AP: {params_new["AP_angulation"]:10.2f} \n'
-            f' RL: {params_new["RL_angulation"]:10.2f} \n'
-            f' FH: {params_new["FH_angulation"]:10.2f}'
-        )
+    if "philips" in manufacturer:
+        for i, params_new in enumerate(params_new_voxels):
+            print(
+                f"\n\nFor voxel {str(i + 1)}, the following "
+                "information should be used at the scanner: "
+                f"\nVoxel Size: \n"
+                f' AP: {params_new["AP_size"]:10.2f} \n'
+                f' RL: {params_new["RL_size"]:10.2f} \n'
+                f' FH: {params_new["FH_size"]:10.2f} '
+                f"\nVoxel off center: \n"
+                f' AP: {params_new["AP_off_center"]:10.2f} \n'
+                f' RL: {params_new["RL_off_center"]:10.2f} \n'
+                f' FH: {params_new["FH_off_center"]:10.2f}'
+                f"\nVoxel angulation: \n"
+                f' AP: {params_new["AP_angulation"]:10.2f} \n'
+                f' RL: {params_new["RL_angulation"]:10.2f} \n'
+                f' FH: {params_new["FH_angulation"]:10.2f}'
+            )
+        print("\n\nProcessing done. You can close the application")
 
 
 class App(QMainWindow):
@@ -142,16 +145,17 @@ class App(QMainWindow):
             data = json.load(my_json)
             self.out_directory = data["OutputDirectory"]
             self.bids_config_file = data["BidsConfigFile"]
-
+        self.spectro_path_1 = ""
+        self.spectro_path_2 = ""
         # Connect sigans and slots
         self.pushButton_sess01_T1.clicked.connect(
             lambda: self.browse_directory("sess01_T1", self.out_directory)
         )
-        self.pushButton_sess01_spar_1.clicked.connect(
-            lambda: self.browse_file("sess01_spar_1", self.out_directory)
+        self.pushButton_sess01_spectro_1.clicked.connect(
+            lambda: self.browse_file("sess01_spectro_1", self.out_directory)
         )
-        self.pushButton_sess01_spar_2.clicked.connect(
-            lambda: self.browse_file("sess01_spar_2", self.out_directory)
+        self.pushButton_sess01_spectro_2.clicked.connect(
+            lambda: self.browse_file("sess01_spectro_2", self.out_directory)
         )
         self.pushButton_sess02_T1.clicked.connect(
             lambda: self.browse_directory("sess02_T1", self.out_directory)
@@ -179,16 +183,13 @@ class App(QMainWindow):
             "Tous les fichiers (*)",
             options=options,
         )
-
         if file_path:
-            self.spar_path_1 = ""
-            self.spar_path_2 = ""
-            if name == "sess01_spar_1":
-                self.spar_path_1 = file_path
-                self.textEdit_sess01_spar_1.setText(self.spar_path_1)
-            elif name == "sess01_spar_2":
-                self.spar_path_2 = file_path
-                self.textEdit_sess01_spar_2.setText(self.spar_path_2)
+            if name == "sess01_spectro_1":
+                self.spectro_path_1 = file_path
+                self.textEdit_sess01_spectro_1.setText(self.spectro_path_1)
+            elif name == "sess01_spectro_2":
+                self.spectro_path_2 = file_path
+                self.textEdit_sess01_spectro_2.setText(self.spectro_path_2)
 
     def browse_directory(self, name, out):
         """Browse DICOM directory"""
@@ -212,7 +213,7 @@ class App(QMainWindow):
     def launch_processing(self):
         """Launch processing"""
         if self.patient_name and self.study_name:
-            if self.spar_path_1 and self.t1_ses1_path and self.t1_ses2_path:
+            if self.spectro_path_1 and self.t1_ses1_path and self.t1_ses2_path:
                 # Convert DICOM to NIfTI
                 out_directory = os.path.join(
                     self.out_directory, self.study_name
@@ -257,35 +258,37 @@ class App(QMainWindow):
                     f"sub-{self.patient_name}",
                     "mrs-voxel-placement",
                 )
-                list_spar_files = [self.spar_path_1]
-                if self.spar_path_2:
-                    list_spar_files.append(self.spar_path_2)
+                list_spectro_files = [self.spectro_path_1]
+                if self.spectro_path_2:
+                    list_spectro_files.append(self.spectro_path_2)
                 if not os.path.exists(analysis_directory):
                     os.makedirs(analysis_directory)
-                params_new_voxels = placement_new_voxel(
+                manufacturer, params_new_voxels = placement_new_voxel(
                     analysis_directory,
                     t1_ses1_nifti_path,
-                    list_spar_files,
+                    list_spectro_files,
                     t1_ses2_nifti_path,
                 )
 
-                for i, params_new in enumerate(params_new_voxels):
-                    print(
-                        f"\n\nFor voxel {str(i + 1)}, the following "
-                        "information should be used at the scanner: "
-                        f"\nVoxel Size: \n"
-                        f' AP: {params_new["AP_size"]:10.2f} \n'
-                        f' RL: {params_new["RL_size"]:10.2f} \n'
-                        f' FH: {params_new["FH_size"]:10.2f} '
-                        f"\nVoxel off center: \n"
-                        f' AP: {params_new["AP_off_center"]:10.2f} \n'
-                        f' RL: {params_new["RL_off_center"]:10.2f} \n'
-                        f' FH: {params_new["FH_off_center"]:10.2f}'
-                        f"\nVoxel angulation: \n"
-                        f' AP: {params_new["AP_angulation"]:10.2f} \n'
-                        f' RL: {params_new["RL_angulation"]:10.2f} \n'
-                        f' FH: {params_new["FH_angulation"]:10.2f}'
-                    )
+                if "philips" in manufacturer:
+                    for i, params_new in enumerate(params_new_voxels):
+                        print(
+                            f"\n\nFor voxel {str(i + 1)}, the following "
+                            "information should be used at the scanner: "
+                            f"\nVoxel Size: \n"
+                            f' AP: {params_new["AP_size"]:10.2f} \n'
+                            f' RL: {params_new["RL_size"]:10.2f} \n'
+                            f' FH: {params_new["FH_size"]:10.2f} '
+                            f"\nVoxel off center: \n"
+                            f' AP: {params_new["AP_off_center"]:10.2f} \n'
+                            f' RL: {params_new["RL_off_center"]:10.2f} \n'
+                            f' FH: {params_new["FH_off_center"]:10.2f}'
+                            f"\nVoxel angulation: \n"
+                            f' AP: {params_new["AP_angulation"]:10.2f} \n'
+                            f' RL: {params_new["RL_angulation"]:10.2f} \n'
+                            f' FH: {params_new["FH_angulation"]:10.2f}'
+                        )
+                print("\n\nProcessing done. You can close the application")
             else:
                 print(
                     "'DICOM T1' fields are mandatory for session 1 and 2. "

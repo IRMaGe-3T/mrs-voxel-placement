@@ -13,7 +13,9 @@ Table of contents
 <a name="disclaimer"></a>
 ## Disclaimer
 This little application has been developed for a specific use and is not intended to be modular.
-For now it is only work for Philips MRS data (using .SPAR file).
+For now it is only work for Philips MRS data (using .SPAR file for MRS data).
+
+Use for Siemens data (using DICOM file for MRS data) is under development
 
 This work have been inspired by the following work:
 
@@ -46,9 +48,9 @@ The following window will appear:
 
 - In the "session 1" part, click on "DICOM T1" and choose your DICOM directory for the first session (that contains T1w image)
 
-- In the "session 1" part, click on "SPAR VOXEL 1" and choose the .spar file of MRS of the first session
+- In the "session 1" part, click on "FILE VOXEL 1" and choose the MRS data (.spar file for Philips) of the first session
 
-- If you have a second MRS acquistion with a different voxel placement for your first session : in the "session 1" part, click on "SPAR VOXEL 2" and choose the .spar file corresponding to this acquistion
+- If you have a second MRS acquistion with a different voxel placement for your first session : in the "session 1" part, click on "FILE VOXEL 2" and choose the MRS data corresponding to this acquistion
 
 - In the "session 2" part, click on "DICOM T1"and choose your DICOM directory for the second session (that contains T1w image)
 
@@ -62,7 +64,7 @@ You can also find all the information in the file `/OutputDirectory/derivatives/
 ### Launch the module with arguements
 
 ```bash
-python /mrs-voxel-placement/mrs-voxel-placement/main.py --session1 path/to/dicom/sess1 --session2 path/to/dicom/sess2 --spar path/to/spar/file/1 path/to/spar/file/2 --study studyname --patient patientname
+python /mrs-voxel-placement/mrs-voxel-placement/main.py --session1 path/to/dicom/sess1 --session2 path/to/dicom/sess2 --spectro_files path/to/spectro/file/1 path/to/spectro/file/2 --study studyname --patient patientname
 ```
 
 The size, off center and angulation to used for the placement of the voxel for the second session will be display on the terminal.
@@ -83,7 +85,6 @@ git clone https://github.com/IRMaGe-3T/mrs-voxel-placement.git
 The following python librairies are required:
 
 - argparse
-- ast
 - dcm2bids>=3.1.1
 - json
 - pyQt5
